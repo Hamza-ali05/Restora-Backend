@@ -177,8 +177,10 @@ class TenantController extends Controller
         ]);
     }
 
-    public function deactivate(Tenant $tenant): JsonResponse
+    public function deactivate(Request $request, Tenant $tenant): JsonResponse
     {
+        $this->assertAdminPassword($request);
+
         $tenant->update(['is_active' => false]);
 
         return response()->json([
