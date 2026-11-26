@@ -26,6 +26,8 @@ class TenantFactory extends Factory
             'contact_number' => fake()->numerify('03#########'),
             'other_contact_number' => fake()->optional()->numerify('03#########'),
             'email' => fake()->unique()->companyEmail(),
+            'location' => fake()->city(),
+            'logo' => null,
             'is_active' => true,
         ];
     }
