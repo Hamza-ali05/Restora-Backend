@@ -22,9 +22,13 @@ class ProfileController extends Controller
             'last_name' => ['sometimes', 'string', 'max:100'],
             'mobile_number' => ['sometimes', 'nullable', 'string', 'max:30'],
             'email' => ['sometimes', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => ['sometimes', 'confirmed', Password::defaults()],
+            'password' => ['sometimes', 'nullable', 'confirmed', Password::defaults()],
             'profile_picture' => ['sometimes', 'file', 'mimes:png', 'max:2048'],
         ]);
+
+        if (empty($data['password'])) {
+            unset($data['password']);
+        }
 
         if ($request->hasFile('profile_picture')) {
             if ($user->profile_picture) {

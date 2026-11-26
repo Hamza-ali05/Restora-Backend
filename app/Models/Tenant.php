@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Tenant extends Model
@@ -38,6 +39,21 @@ class Tenant extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(TenantSubscription::class);
+    }
+
+    public function currentSubscription(): HasOne
+    {
+        return $this->hasOne(TenantSubscription::class)->latestOfMany();
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(SubscriptionPayment::class);
     }
 
     public static function makeSlug(string $restaurantName): string

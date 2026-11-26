@@ -16,6 +16,7 @@ class TenantController extends Controller
     public function index(): JsonResponse
     {
         $tenants = Tenant::query()
+            ->with(['currentSubscription.plan'])
             ->withCount('users')
             ->orderByDesc('created_at')
             ->get()
@@ -66,7 +67,7 @@ class TenantController extends Controller
         $tenant = $result['tenant'];
 
         return response()->json([
-            'tenant' => $this->tenantPayload($tenant->loadCount('users')),
+            'tenant' => $this->tenantPayload($tenant->loadCount('users')->load('currentSubscription.plan')),
             'owner' => [
                 'id' => $result['owner']->id,
                 'first_name' => $result['owner']->first_name,
@@ -81,7 +82,7 @@ class TenantController extends Controller
     public function show(Tenant $tenant): JsonResponse
     {
         return response()->json([
-            'tenant' => $this->tenantPayload($tenant->loadCount('users')),
+            'tenant' => $this->tenantPayload($tenant->loadCount('users')->load('currentSubscription.plan')),
         ]);
     }
 
@@ -102,18 +103,33 @@ class TenantController extends Controller
         $tenant->update($data);
 
         return response()->json([
-            'tenant' => $this->tenantPayload($tenant->fresh()->loadCount('users')),
+            'tenant' => $this->tenantPayload($tenant->fresh()->loadCount('users')->load('currentSubscription.plan')),
         ]);
     }
 
-    public function destroy(Tenant $tenant): JsonResponse
+    public function activate(Tenant $tenant): JsonResponse
+    {
+        $tenant->update(['is_active' => true]);
+
+        return response()->json([
+            'message' => 'Tenant activated.',
+            'tenant' => $this->tenantPayload($tenant->fresh()->loadCount('users')->load('currentSubscription.plan')),
+        ]);
+    }
+
+    public function deactivate(Tenant $tenant): JsonResponse
     {
         $tenant->update(['is_active' => false]);
 
         return response()->json([
             'message' => 'Tenant deactivated.',
-            'tenant' => $this->tenantPayload($tenant->fresh()->loadCount('users')),
+            'tenant' => $this->tenantPayload($tenant->fresh()->loadCount('users')->load('currentSubscription.plan')),
         ]);
+    }
+
+    public function destroy(Tenant $tenant): JsonResponse
+    {
+        return $this->deactivate($tenant);
     }
 
     /**
@@ -121,6 +137,8 @@ class TenantController extends Controller
      */
     protected function tenantPayload(Tenant $tenant): array
     {
+        $sub = $tenant->currentSubscription;
+
         return [
             'id' => $tenant->id,
             'name' => $tenant->name,
@@ -131,6 +149,15 @@ class TenantController extends Controller
             'is_active' => $tenant->is_active,
             'users_count' => $tenant->users_count ?? $tenant->users()->count(),
             'url' => $tenant->url(),
+            'subscription' => $sub ? [
+                'id' => $sub->id,
+                'status' => $sub->status,
+                'plan_name' => $sub->plan?->name,
+                'plan_id' => $sub->subscription_plan_id,
+                'price_monthly' => $sub->plan?->price_monthly,
+                'currency' => $sub->plan?->currency,
+                'renews_at' => $sub->renews_at,
+            ] : null,
             'created_at' => $tenant->created_at,
             'updated_at' => $tenant->updated_at,
         ];
