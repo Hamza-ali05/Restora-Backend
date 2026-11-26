@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Creates the UUID-backed `tenants` table (restaurant workspaces) and `users`.
+     * There is no separate create_tenants_table migration — tenants live here.
+     * Later columns: location/logo in 2026_11_26_140000_add_location_and_logo_to_tenants_table.
      */
     public function up(): void
     {

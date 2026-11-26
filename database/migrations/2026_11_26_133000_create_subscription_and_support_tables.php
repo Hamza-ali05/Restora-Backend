@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Subscription / payment / support tables — all UUID PKs with foreignUuid tenant_id
+     * referencing tenants.id from 0001_01_01_000000_create_users_table.
+     */
     public function up(): void
     {
         Schema::create('subscription_plans', function (Blueprint $table) {

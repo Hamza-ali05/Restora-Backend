@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\Platform\ConfirmPasswordController;
 use App\Http\Controllers\Api\Platform\DashboardController;
 use App\Http\Controllers\Api\Platform\PaymentController;
 use App\Http\Controllers\Api\Platform\ProfileController;
@@ -26,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/tenants', [TenantController::class, 'index']);
             Route::post('/tenants', [TenantController::class, 'store']);
             Route::get('/tenants/{tenant}', [TenantController::class, 'show']);
-            Route::patch('/tenants/{tenant}', [TenantController::class, 'update']);
+            Route::match(['patch', 'post'], '/tenants/{tenant}', [TenantController::class, 'update']);
             Route::delete('/tenants/{tenant}', [TenantController::class, 'destroy']);
             Route::post('/tenants/{tenant}/activate', [TenantController::class, 'activate']);
             Route::post('/tenants/{tenant}/deactivate', [TenantController::class, 'deactivate']);
@@ -48,5 +49,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('/support-messages/{supportMessage}', [SupportMessageController::class, 'update']);
 
             Route::match(['patch', 'post'], '/profile', [ProfileController::class, 'update']);
+            Route::post('/confirm-password', ConfirmPasswordController::class);
         });
 });

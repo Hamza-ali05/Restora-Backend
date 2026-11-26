@@ -84,9 +84,19 @@ class AuthController extends Controller
         /** @var User|null $user */
         $user = $request->user();
 
+        $tenant = TenantContext::tenant();
+
         return response()->json([
             'user' => $user ? $this->userPayload($user) : null,
-            'tenant' => TenantContext::tenant()?->only(['id', 'name', 'slug', 'email', 'is_active']),
+            'tenant' => $tenant ? [
+                'id' => $tenant->id,
+                'name' => $tenant->name,
+                'slug' => $tenant->slug,
+                'email' => $tenant->email,
+                'location' => $tenant->location,
+                'logo' => $tenant->logoUrl(),
+                'is_active' => $tenant->is_active,
+            ] : null,
         ]);
     }
 

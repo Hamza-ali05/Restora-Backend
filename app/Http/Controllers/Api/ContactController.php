@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\SupportMessage;
+use App\Support\TenantContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,7 @@ class ContactController extends Controller
         $message = SupportMessage::query()->create([
             ...$data,
             'status' => 'new',
+            'tenant_id' => TenantContext::tenant()?->id,
         ]);
 
         return response()->json([

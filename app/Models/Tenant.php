@@ -23,8 +23,15 @@ class Tenant extends Model
         'contact_number',
         'other_contact_number',
         'email',
+        'location',
+        'logo',
         'is_active',
     ];
+
+    public function logoUrl(): ?string
+    {
+        return $this->logo ? url('storage/'.$this->logo) : null;
+    }
 
     /**
      * @return array<string, string>
